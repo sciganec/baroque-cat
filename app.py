@@ -16,7 +16,14 @@ st.markdown("""
 
 st.title("🐈 Baroque-Cat: Резиденція (Groq Edition)")
 st.sidebar.header("📜 Ключі до Ефіру")
-api_key = st.sidebar.text_input("Groq API Key (gsk_...)", type="password")
+# Замість api_key = st.sidebar.text_input(...) використовуйте це:
+
+if "GROQ_API_KEY" in st.secrets:
+    api_key = st.secrets["GROQ_API_KEY"]
+else:
+    api_key = st.sidebar.text_input("Введіть ключ, якщо сейф порожній", type="password")
+
+# Решта коду залишається такою ж, але тепер api_key буде підхоплюватися автоматично.
 
 user_code = st.text_input("Введіть 6-бітний код матриці:", value="101010")
 
