@@ -2,146 +2,107 @@ import streamlit as st
 import requests
 import pandas as pd
 
-# --- КОНФІГУРАЦІЯ ПРОСТОРУ ---
-st.set_page_config(
-    page_title="Baroque-Cat Residence",
-    page_icon="🐈",
-    layout="centered"
-)
+# --- КОНФІГУРАЦІЯ РЕЗИДЕНЦІЇ ---
+st.set_page_config(page_title="Baroque-Cat Residence", page_icon="🐈", layout="centered")
 
-# --- ЕСТЕТИКА ТА СТИЛЬ ---
+# --- СТИЛІЗАЦІЯ ---
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #d4af37; }
-    .stMetric { border: 1px solid #d4af37; padding: 15px; border-radius: 10px; background: #1c1c1c; }
     h1, h2, h3 { color: #d4af37 !important; font-family: 'Georgia', serif; text-align: center; }
     div.stButton > button { 
-        background-color: #1c1c1c; 
-        color: #d4af37; 
-        border: 2px solid #d4af37; 
-        width: 100%;
-        border-radius: 20px;
-        transition: 0.3s;
+        background-color: #1c1c1c; color: #d4af37; border: 2px solid #d4af37; 
+        border-radius: 20px; width: 100%; height: 3em; font-weight: bold;
     }
-    div.stButton > button:hover { border-color: #ffffff; color: #ffffff; }
-    .block-container { padding-top: 2rem; }
+    .stInfo { background-color: #1c1c1c; color: #d4af37; border: 1px solid #d4af37; border-radius: 10px; }
+    /* Стилізація CSV вікна */
+    code { color: #d4af37 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🏛️ Baroque-Cat: Аналітична Резиденція")
+st.title("🏛️ Резиденція Маркіза Baroque-Cat")
 
-# --- ДОДАЙТЕ ЦЕЙ БЛОК ПЕРЕД ЗАПИТОМ ДО API ---
+# --- СЕЙФ КЛЮЧІВ ---
+api_key = st.secrets.get("GROQ_API_KEY") or st.sidebar.text_input("Groq API Key:", type="password")
 
-audio_url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" # Тестовий трек
-# Для справжніх "Чотирьох сезонів" краще використати пряме посилання на mp3 (наприклад, з архіву)
-vivaldi_spring = "https://upload.wikimedia.org/wikipedia/commons/2/21/Vivaldi_Spring_mvt_1_Allegro_-_John_Harrison_with_the_Wichita_State_University_Chamber_Players.mp3"
-
-if st.button("Активувати роздуми Маркіза під акомпанемент Вівальді"):
-    # Вмикаємо музику
-    st.markdown(f'<audio src="{vivaldi_spring}" autoplay loop style="display:none;"></audio>', unsafe_allow_html=True)
-    
-    if not api_key:
-        st.error("Пане Архітектор, тиша в залах... Ключ не знайдено.")
-    else:
-        # --- ВАШ ПОПЕРЕДНІЙ БЛОК ЗАПИТУ ДО GROQ ---
-        # (Тут залишається код із посиленим красномовством Маркіза)
-        
-        with st.spinner("Під звуки скрипок Маркіз творить історію..."):
-            # ... (requests.post і вивід відповіді)
-
-# --- РОБОТА З КЛЮЧАМИ (СЕЙФ) ---
-if "GROQ_API_KEY" in st.secrets:
-    api_key = st.secrets["GROQ_API_KEY"]
-else:
-    st.sidebar.warning("Ключ не знайдено в Secrets.")
-    api_key = st.sidebar.text_input("Введіть Groq API Key вручну:", type="password")
-
-# --- ВВІД ДАНИХ ---
-user_code = st.text_input("Введіть 6-бітний код матриці (напр. 110110):", value="110110")
+# --- ВВІД ПАРАМЕТРІВ ---
+user_code = st.text_input("Введіть 6-бітний код матриці:", value="110110")
 
 # Перевірка вводу
 if len(user_code) != 6 or not set(user_code).issubset({'0', '1'}):
-    st.error("Пане Архітектор, код має складатися рівно з 6 бітів (0 або 1).")
+    st.error("Помилка: код має складатися рівно з 6 бітів (0 або 1).")
     st.stop()
 
-# --- МАТЕМАТИЧНИЙ АПАРАТ (UNICODE) ---
+# --- МАТЕМАТИКА (UNICODE) ---
 h11 = user_code.count('1')
 h21 = user_code.count('0')
 chi = 2 * (h11 - h21)
 
-# --- ВІЗУАЛІЗАЦІЯ ---
-col_hex, col_math = st.columns([1, 1])
+# Візуалізація гексаграми
+st.markdown("### Структура Ефіру")
+for bit in reversed(user_code):
+    line = "【 ———————— 】" if bit == '1' else "【 ———    ——— 】"
+    st.markdown(f"### {line}")
 
-with col_hex:
-    st.subheader("Гексаграма")
-    # Малюємо гексаграму знизу вгору (традиційно)
-    for bit in reversed(user_code):
-        line = "【 ———————— 】" if bit == '1' else "【 ———    ——— 】"
-        st.markdown(f"### {line}")
+st.markdown(f"<center><b>h¹¹ = {h11} | h²¹ = {h21} | χ = {chi}</b></center>", unsafe_allow_html=True)
 
-with col_math:
-    st.subheader("Топологія")
-    st.markdown(f"**Число Ходжа h¹¹:** `{h11}`")
-    st.markdown(f"**Число Ходжа h²¹:** `{h21}`")
-    st.markdown(f"**Ейлерова характеристика χ:** `{chi}`")
-    st.markdown(f"**Формула:** χ = 2(h¹¹ - h²¹)")
-
-st.markdown("---")
-
-# --- ІНТЕЛЕКТ МАРКІЗА (КРАСНОМОВНА ВЕРСІЯ) ---
-if st.button("Активувати роздуми Маркіза"):
+# --- ГОЛОВНА ДІЯ ---
+if st.button("Запитати поради у Маркіза (Vivaldi Play)"):
     if not api_key:
-        st.error("Пане Архітектор, сейф із ключами порожній!")
+        st.error("Ключ не знайдено! Перевірте Secrets або введіть його вручну.")
     else:
+        # Музика (Весна Вівальді)
+        vivaldi_url = "https://upload.wikimedia.org/wikipedia/commons/2/21/Vivaldi_Spring_mvt_1_Allegro_-_John_Harrison_with_the_Wichita_State_University_Chamber_Players.mp3"
+        st.markdown(f'<audio src="{vivaldi_url}" autoplay loop></audio>', unsafe_allow_html=True)
+        
+        # Запит до Groq з оновленим зверненням
         url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {api_key.strip()}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {api_key.strip()}", "Content-Type": "application/json"}
+        
         prompt = (
-            f"Ти — Маркіз Baroque-Cat, витончений вчений-кіт, майстер барокової риторики. "
-            f"Твій стиль — інтелектуальний бенкет. Звертайся 'Вельмишановне Панство'. "
-            f"Дай розлогий аналіз коду {user_code} (h11={h11}, h21={h21}, chi={chi}). "
-            f"Порівняй числа Ходжа з елементами палацу, а Ейлерову характеристику — з душею простору."
+            f"Ти — Маркіз Baroque-Cat, витончений вчений-кіт. Твій стиль — розкішне бароко, мова пишна та метафорична. "
+            f"Звертайся до користувача виключно як 'Панство'. Проаналізуй код {user_code} "
+            f"(h11={h11}, h21={h21}, chi={chi}) як величну архітектурну та музичну композицію. "
+            f"Твоя порада має стосуватися гармонії простору та душі."
         )
+        
         data = {
             "model": "llama-3.3-70b-versatile",
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.85, # Додаємо вогню красномовства
-            "max_tokens": 1000
+            "temperature": 0.85
         }
-        
-        with st.spinner("Маркіз занурює перо у золоте чорнило..."):
+
+        with st.spinner("Маркіз гострить золоте перо під звуки скрипок..."):
             try:
                 res = requests.post(url, headers=headers, json=data)
                 if res.status_code == 200:
                     answer = res.json()['choices'][0]['message']['content']
-                    st.markdown(f"### 🐾 Слово Маркіза:\n{answer}")
+                    st.info(f"🐈 **Маркіз каже:**\n\n{answer}")
                 else:
-                    st.error(f"Ефір обурений! Код помилки: {res.status_code}")
+                    st.error(f"Помилка API ({res.status_code}): {res.text}")
             except Exception as e:
-                st.error(f"Критичний збій у залах: {e}")
+                st.error(f"Критичний збій зв'язку: {e}")
 
-# --- ЗВІТНІСТЬ CSV ---
+# --- ЕКСПОРТ CSV ---
 st.markdown("---")
-data_row = {
-    "Address": user_code,
-    "h1_1": h11,
-    "h2_1": h21,
+st.subheader("📊 Звіт у форматі CSV")
+df = pd.DataFrame([{
+    "Address": user_code, 
+    "h1_1": h11, 
+    "h2_1": h21, 
     "Euler_Chi": chi,
-    "Formula": "chi = 2 * (h11 - h21)"
-}
-df = pd.DataFrame([data_row])
+    "Formula": "χ = 2(h¹¹ - h²¹)"
+}])
 
-st.subheader("📊 Табличні дані (CSV)")
-csv_output = df.to_csv(index=False)
-st.text(csv_output)
+# Відображення CSV тексту
+st.code(df.to_csv(index=False))
 
+# Кнопка завантаження
 st.download_button(
-    label="📥 Завантажити CSV звіт",
-    data=csv_output,
-    file_name=f"marquis_report_{user_code}.csv",
+    label="📥 Завантажити CSV", 
+    data=df.to_csv(index=False), 
+    file_name=f"report_{user_code}.csv", 
     mime="text/csv"
 )
 
-st.markdown("<br><center><small>Резиденція Маркіза • 2026 • Пане Архітектор, простір підвладний вам</small></center>", unsafe_allow_html=True)
+st.markdown("<br><center><small>Резиденція Маркіза • 2026 • Панство, простір підвладний вашій думці</small></center>", unsafe_allow_html=True)
