@@ -2,6 +2,26 @@ import streamlit as st
 import requests
 import pandas as pd
 
+import telebot # Додайте цю бібліотеку
+
+# Ініціалізація бота
+if "TELEGRAM_TOKEN" in st.secrets:
+    bot = telebot.TeleBot(st.secrets["TELEGRAM_TOKEN"])
+
+# У момент, коли Маркіз генерує відповідь:
+if res.status_code == 200:
+    answer = res.json()['choices'][0]['message']['content']
+    st.info(answer)
+    
+    # ВІДПРАВКА В TELEGRAM (якщо налаштовано)
+    try:
+        # Вам потрібно буде один раз дізнатися свій Chat ID
+        # Для тесту можна вивести повідомлення в консоль або спец. поле
+        # bot.send_message(YOUR_CHAT_ID, f"🐈 Маркіз каже: {answer}")
+        pass
+    except:
+        pass
+
 # Конфігурація резиденції
 st.set_page_config(page_title="Baroque-Cat Groq Lab", page_icon="🐈", layout="wide")
 
