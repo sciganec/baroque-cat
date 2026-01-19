@@ -120,8 +120,7 @@ if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
                   f"Все базуй на стані {hex_char} та числі {tech_vector}. "
                   f"Теми: сродна праця, пізнання себе, дві натури. "
                   f"КАТЕГОРІЙНО ЗАБОРОНЕНО: ієрогліфи, технічні коди, дужки. Тільки чисте українське слово.")
-        
-       try:
+        try:
             res = requests.post("https://api.groq.com/openai/v1/chat/completions", 
                                 headers={"Authorization": f"Bearer {api_key}"},
                                 json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}]})
