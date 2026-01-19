@@ -4,103 +4,79 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# --- КОНФІГУРАЦІЯ ТА МОБІЛЬНИЙ ДИЗАЙН ---
-st.set_page_config(page_title="Marquis Kotsky", page_icon="🐈", layout="centered")
+# --- ТЕХНІЧНИЙ РЕЄСТР ЮНІКОДУ ТА ВЕРТИКАЛЕЙ ---
+UNICODE_MAP = {
+    "111111": ("䷀", "{AAAAAA}"), "000000": ("䷁", "{VVVVVV}"), "100010": ("䷂", "{AVVVAV}"),
+    "010001": ("䷃", "{VAVVVA}"), "111010": ("䷄", "{AAAVAV}"), "010111": ("䷅", "{VAVAAA}"),
+    "010000": ("䷆", "{VAVVVV}"), "000010": ("䷇", "{VVVVAV}"), "111011": ("䷈", "{AAAVAA}"),
+    "110111": ("䷉", "{AAVAAA}"), "111000": ("䷊", "{AAAVVV}"), "000111": ("䷋", "{VVVAAA}"),
+    "101111": ("䷌", "{AVAAAA}"), "111101": ("䷍", "{AAAAAV}"), "001000": ("䷎", "{VVAVVV}"),
+    "000100": ("䷏", "{VVVAVV}"), "100110": ("䷐", "{AVVAAV}"), "011001": ("䷑", "{VAAVVA}"),
+    "110000": ("䷒", "{AAVVVV}"), "000011": ("䷓", "{VVVVAA}"), "100101": ("䷔", "{AVVAVA}"),
+    "101001": ("䷕", "{AVAVVA}"), "000001": ("䷖", "{VVVVVA}"), "100000": ("䷗", "{AVVVVV}"),
+    "100111": ("䷘", "{AVVAAA}"), "111001": ("䷙", "{AAAVVA}"), "100001": ("䷚", "{AVVVVA}"),
+    "011110": ("䷛", "{VAAAAV}"), "010010": ("䷜", "{VAVVAV}"), "101101": ("䷝", "{AVAAAA}"),
+    "001110": ("䷞", "{VVAAAV}"), "011100": ("䷟", "{VAAAVV}"), "001111": ("䷠", "{VVAAAA}"),
+    "111100": ("䷡", "{AAAAVV}"), "000101": ("䷢", "{VVVAVA}"), "101000": ("䷣", "{AVAVVV}"),
+    "101011": ("䷤", "{AVAVAA}"), "110101": ("䷥", "{AAVAVA}"), "001010": ("䷦", "{VVAVAV}"),
+    "010100": ("䷧", "{VAVAVV}"), "110001": ("䷨", "{AAVVVA}"), "100011": ("䷩", "{AVVVAA}"),
+    "111110": ("䷪", "{AAAAAV}"), "011111": ("䷫", "{VAAAAA}"), "000110": ("䷬", "{VVVAAV}"),
+    "011000": ("䷭", "{VAAVVV}"), "010110": ("䷮", "{VAVAAV}"), "011010": ("䷯", "{VAAVAV}"),
+    "101110": ("䷰", "{AVAAVV}"), "011101": ("䷱", "{VAAAVA}"), "100100": ("䷲", "{AVVAVV}"),
+    "001001": ("䷳", "{VVAVVA}"), "001011": ("䷴", "{VVAVAA}"), "110100": ("䷵", "{AAVAVV}"),
+    "101100": ("䷶", "{AVAAVV}"), "001101": ("䷷", "{VVAAVA}"), "011011": ("䷸", "{VAAVAA}"),
+    "110110": ("䷹", "{AAVAAV}"), "010011": ("䷺", "{VAVVAA}"), "110010": ("䷻", "{AAVVAV}"),
+    "110011": ("䷼", "{AAVVAA}"), "001100": ("䷽", "{VVAAVV}"), "101010": ("䷾", "{AVAVAV}"),
+    "010101": ("䷿", "{VAVAVA}")
+}
+
+# --- КОНФІГУРАЦІЯ ТА СТИЛЬ ---
+st.set_page_config(page_title="Marquis Kotsky", page_icon="🐈")
 
 st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #d4af37; }
-    
-    /* Виправлене та адаптоване гасло */
-    .big-greeting { 
-        font-size: 1.4rem !important; 
-        font-weight: bold; 
-        text-align: center; 
-        padding: 40px 15px 20px 15px; /* Більший відступ зверху */
-        line-height: 1.4;
-        font-family: 'Georgia', serif;
-        min-height: 100px;
-    }
-
-    /* Головна іконка-кнопка */
+    .big-greeting { font-size: 1.4rem; text-align: center; padding: 40px 10px; font-family: 'Georgia', serif; }
+    .hex-symbol { font-size: 8rem; text-align: center; color: #d4af37; margin: -10px 0; text-shadow: 0px 0px 15px #d4af3799; }
     div.stButton > button { 
-        background-color: #d4af37; color: #0e1117; 
-        border-radius: 50px; width: 100%; height: 5rem;
-        font-size: 1.5rem !important; font-weight: bold;
-        border: 2px solid #ffffff;
-        box-shadow: 0px 0px 20px rgba(212, 175, 55, 0.5);
-        transition: 0.3s;
+        background-color: #d4af37; color: #0e1117; border-radius: 50px; 
+        width: 100%; height: 4.5rem; font-size: 1.4rem !important; font-weight: bold; border: 2px solid #fff;
     }
-    div.stButton > button:active { transform: scale(0.98); }
-
-    .small-code {
-        font-size: 0.6rem; color: #2c2c2c;
-        text-align: center; margin-top: 80px; font-family: monospace;
-    }
-    
-    /* Оптимізація відступів контейнера */
-    .block-container { padding-top: 0rem !important; }
-    .stImage { margin-top: 10px; }
+    .stInfo { background-color: #1c1c1c; border: 1px solid #d4af37; color: #d4af37; border-radius: 15px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 1. ВІТАЛЬНЕ ГАСЛО ---
-st.markdown('<div class="big-greeting">Вельмишановне Панство, вельми радий вітати Вас у резиденціях маркіза Коцького!</div>', unsafe_allow_html=True)
+st.markdown('<div class="big-greeting">Вітаємо у Резиденції, пане Архітектор!</div>', unsafe_allow_html=True)
 
-# --- 2. ПОРТРЕТ МАРКІЗА ---
-image_path = "marquis.png"
-if os.path.exists(image_path):
-    st.image(image_path, use_container_width=True)
-else:
-    st.image("https://r2.erweima.ai/i/EE753FD2-1D8C-4D0E-868C-7A77851A0534.PNG", use_container_width=True)
+if os.path.exists("marquis.png"):
+    st.image("marquis.png", use_container_width=True)
 
-# --- 3. ТЕМПОРАЛЬНИЙ АЛГОРИТМ ---
+# --- АЛГОРИТМ ---
 now = datetime.now()
 def get_bits(val, limit):
     q = min(3, val // (limit // 4 + 1))
     return {0: "10", 1: "11", 2: "01", 3: "00"}.get(q, "00")
 
 current_hex = get_bits(now.hour, 24) + get_bits(now.weekday(), 7) + get_bits(now.day - 1, 31)
-
-# --- 4. ГОЛОВНА ДІЯ: ПРИЙНЯТИ АУДІЄНЦІЮ ---
-api_key = st.secrets.get("GROQ_API_KEY")
+hex_char, vector = UNICODE_MAP.get(current_hex, ("䷀", "{AAAAAA}"))
 
 if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
-    # Активація музики (тихо)
-    music_path = "vivaldi.mp3"
-    if os.path.exists(music_path):
-        with open(music_path, "rb") as f:
-            audio_bytes = f.read()
-        st.audio(audio_bytes, format="audio/mp3", autoplay=True)
-    else:
-        # Резерв
-        st.audio("https://upload.wikimedia.org/wikipedia/commons/2/21/Vivaldi_Spring_mvt_1_Allegro_-_John_Harrison_with_the_Wichita_State_University_Chamber_Players.mp3", autoplay=True)
+    if os.path.exists("vivaldi.mp3"):
+        with open("vivaldi.mp3", "rb") as f:
+            st.audio(f.read(), format="audio/mp3", autoplay=True)
+    
+    st.markdown(f'<div class="hex-symbol">{hex_char}</div>', unsafe_allow_html=True)
+    
+    api_key = st.secrets.get("GROQ_API_KEY")
+    if api_key:
+        prompt = (f"Ти Маркіз Коцький. Звертайся 'Панство'. Опиши стан {hex_char} (вектор {vector}) "
+                  "бароковою мовою під музику Вівальді. Без цифр.")
+        try:
+            res = requests.post("https://api.groq.com/openai/v1/chat/completions", 
+                                headers={"Authorization": f"Bearer {api_key}"},
+                                json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}]})
+            st.info(res.json()['choices'][0]['message']['content'])
+        except:
+            st.error("Аудієнцію перервано.")
 
-    if not api_key:
-        st.error("Панство, сейф із ключами порожній.")
-    else:
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {api_key.strip()}", "Content-Type": "application/json"}
-        prompt = (
-            f"Ти — Маркіз Коцький, шляхетний кіт. Звертайся до користувача 'Панство'. "
-            f"Проаналізуй стан буття для темпорального коду {current_hex}. "
-            f"У ТЕКСТІ НЕ ПОВИННО БУТИ цифр, кодів чи згадок про І Цзин. "
-            f"Говори вишукано про чай, шахи, затишок та барокову музику, що зараз лунає."
-        )
-        
-        with st.spinner("Маркіз відкладає шахову фігуру..."):
-            try:
-                res = requests.post(url, headers=headers, json={
-                    "model": "llama-3.3-70b-versatile",
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.8
-                })
-                if res.status_code == 200:
-                    st.info(res.json()['choices'][0]['message']['content'])
-                else:
-                    st.error("Маркіз наразі не може відповісти.")
-            except:
-                st.error("Зв'язок із палацом перервано.")
-
-# --- 5. ТЕХНІЧНИЙ НИЗ ---
-st.markdown(f'<div class="small-code">matrix: {current_hex}</div>', unsafe_allow_html=True)
+st.markdown(f'<center><small style="color:#2c2c2c">matrix: {current_hex} | vector: {vector}</small></center>', unsafe_allow_html=True)
