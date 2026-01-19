@@ -89,7 +89,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown('<div class="big-greeting">Вельмишановне Панство, вельми радий вітати Вас у резиденціях маркіза Коцького!</div>', unsafe_allow_html=True)
+st.markdown('<div class="big-greeting">Вельмишановне Панство, вельми раді вітати Вас у резиденціях маркіза Коцького!</div>', unsafe_allow_html=True)
 
 # Відображення малюнку
 if os.path.exists("marquis.png"):
