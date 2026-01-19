@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 
 # --- ТЕХНІЧНИЙ РЕЄСТР: ВНУТРІШНЯ НАТУРА ЧАСУ ---
-# [cite_start]Дані інтегровані згідно з технічними манускриптами [cite: 2, 3, 4, 7-38]
+# Дані верифіковано згідно з манускриптами
 UNICODE_MAP = {
     "000000": ("䷁", "{VVVVVV; IT IT IT; N N N}"),
     "000001": ("䷖", "{VVVVVA; IT IT YU; N N W}"),
@@ -80,7 +80,7 @@ st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #d4af37; }
     .big-greeting { font-size: 1.4rem; text-align: center; padding: 40px 10px; font-family: 'Georgia', serif; }
-    .hex-symbol { font-size: 8rem; text-align: center; color: #d4af37; margin: -10px 0; text-shadow: 0px 0px 15px #d4af3799; }
+    .hex-symbol { font-size: 8rem; text-align: center; color: #d4af37; margin: 10px 0; text-shadow: 0px 0px 15px #d4af3799; }
     div.stButton > button { 
         background-color: #d4af37; color: #0e1117; border-radius: 50px; 
         width: 100%; height: 4.5rem; font-size: 1.4rem !important; font-weight: bold; border: 2px solid #fff;
@@ -91,14 +91,16 @@ st.markdown("""
 
 st.markdown('<div class="big-greeting">Вельмишановне Панство, вельми радий вітати Вас у резиденціях маркіза Коцького!</div>', unsafe_allow_html=True)
 
-# Відображення малюнку з виправленим параметром
+# Відображення малюнку
 if os.path.exists("marquis.png"):
     st.image("marquis.png", use_container_width=True)
 
 # --- ОБЧИСЛЕННЯ ЧАСУ ТА СЕРЦЯ ---
 now = datetime.now()
 def get_bits(val, limit):
-    q = min(3, val // (limit // 4 + 1))
+    # Додано +1 для уникнення ділення на нуль та коректного розподілу часток
+    step = (limit // 4) + 1
+    q = min(3, val // step)
     return {0: "10", 1: "11", 2: "01", 3: "00"}.get(q, "00")
 
 current_matrix = get_bits(now.hour, 24) + get_bits(now.weekday(), 7) + get_bits(now.day - 1, 31)
@@ -109,24 +111,27 @@ if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
         with open("vivaldi.mp3", "rb") as f:
             st.audio(f.read(), format="audio/mp3", autoplay=True)
     
-    # Символ гексаграми знову присутній у залі аудієнцій
+    # Символ виводиться першим для налаштування на потрібний лад
     st.markdown(f'<div class="hex-symbol">{hex_char}</div>', unsafe_allow_html=True)
     
     api_key = st.secrets.get("GROQ_API_KEY")
     if api_key:
+        # Промпт максимально інтегрує Сковороду та Бароко
         prompt = (f"Ти Маркіз Коцький. Звертайся 'шановне Панство'. "
-                  f"Твоє послання базується на філософському стані, який несе символ {hex_char} "
-                  [cite_start]f"та розрахунок {technical_vector} [cite: 7-38]. "
-                  f"У промові використовуй поняття 'символ' та 'число', але уникай слова 'гексаграма'. "
-                  f"Стиль: пишне українське бароко та світлий розум Григорія Сковороди. "
-                  f"Тлумач цей символ через 'сродну працю', 'пізнання себе' та 'фонтан нерівної рівності'. "
-                  f"Опиши, як у цьому числі захована таємниця 'внутрішньої людини'.")
+                  f"Твоя проповідь ґрунтується на стані символу {hex_char} та числі {technical_vector}. "
+                  f"Використовуй слова 'символ' та 'число', але уникай слова 'гексаграма'. "
+                  f"Стиль: високе українське бароко, філософія Григорія Сковороди. "
+                  f"Говори про 'сродну працю', 'дві натури', 'фонтан нерівної рівності' та 'пізнання себе'. "
+                  f"Тлумач цей момент як частину саду божественних пісень.")
         try:
             res = requests.post("https://api.groq.com/openai/v1/chat/completions", 
                                 headers={"Authorization": f"Bearer {api_key}"},
                                 json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}]})
-            st.info(res.json()['choices'][0]['message']['content'])
-        except:
-            st.error("Аудієнцію затьмарено хвилею неспокою.")
+            if res.status_code == 200:
+                st.info(res.json()['choices'][0]['message']['content'])
+            else:
+                st.error("Зв'язок із вищими сферами (API) тимчасово перервано.")
+        except Exception as e:
+            st.error(f"Аудієнцію затьмарено помилкою: {e}")
 
 st.markdown(f'<center><small style="color:#2c2c2c">Плин вічності у матриці {current_matrix}</small></center>', unsafe_allow_html=True)
