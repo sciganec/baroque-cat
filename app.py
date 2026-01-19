@@ -111,27 +111,23 @@ if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
         with open("vivaldi.mp3", "rb") as f:
             st.audio(f.read(), format="audio/mp3", autoplay=True)
     
-    # Символ виводиться першим для налаштування на потрібний лад
     st.markdown(f'<div class="hex-symbol">{hex_char}</div>', unsafe_allow_html=True)
     
     api_key = st.secrets.get("GROQ_API_KEY")
     if api_key:
-        # Промпт максимально інтегрує Сковороду та Бароко
+        # Побудовано на базі манускриптів
         prompt = (f"Ти Маркіз Коцький. Звертайся 'шановне Панство'. "
-                  f"Твоя проповідь ґрунтується на стані символу {hex_char} та числі {technical_vector}. "
-                  f"Використовуй слова 'символ' та 'число', але уникай слова 'гексаграма'. "
-                  f"Стиль: високе українське бароко, філософія Григорія Сковороди. "
-                  f"Говори про 'сродну працю', 'дві натури', 'фонтан нерівної рівності' та 'пізнання себе'. "
-                  f"Тлумач цей момент як частину саду божественних пісень.")
+                  f"Твоя проповідь ґрунтується на стані {hex_char} (його внутрішній зміст: {technical_vector}). "
+                  f"КАТЕГОРІЙНО ЗАБОРОНЕНО виводити технічні коди на кшталт 'AVAVVA', 'ME ME YU' чи будь-які фігурні дужки. "
+                  f"Текст має бути КРИШТАЛЕВО ЧИСТИМ: лише високе бароко та філософія Григорія Сковороди. "
+                  f"Трансформуй числові значення у метафори: сродна праця, фонтан, сад, дві натури. "
+                  f"Розкажи про цей момент як про божественну симфонію, уникаючи технічного сміття.")
         try:
             res = requests.post("https://api.groq.com/openai/v1/chat/completions", 
                                 headers={"Authorization": f"Bearer {api_key}"},
                                 json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}]})
-            if res.status_code == 200:
-                st.info(res.json()['choices'][0]['message']['content'])
-            else:
-                st.error("Зв'язок із вищими сферами (API) тимчасово перервано.")
-        except Exception as e:
-            st.error(f"Аудієнцію затьмарено помилкою: {e}")
+            st.info(res.json()['choices'][0]['message']['content'])
+        except:
+            st.error("Аудієнцію затьмарено невидимою перешкодою.")
 
 st.markdown(f'<center><small style="color:#2c2c2c">Плин вічності у матриці {current_matrix}</small></center>', unsafe_allow_html=True)
