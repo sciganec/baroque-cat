@@ -4,8 +4,18 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# --- ТЕХНІЧНИЙ РЕЄСТР: СИМВОЛИ ТА ВЕКТОРИ ---
-# Побудовано на основі манускриптів [cite: 2, 3, 4, 7-38]
+# --- ТАЙНОПИС ДУХУ: МАТРИЦЯ СТАНІВ ---
+# Внутрішня структура базується на розрахунках згідно з джерелами 
+# Проте для Панства назви станів перекладені мовою серця та барокових образів
+SPIRIT_MAP = {
+    "000000": "Тиша спокою, де Світ ловив, та не спіймав",
+    "111111": "Нескінченна сила Творця у кожній зернині",
+    "101010": "Рівна всім рівність у фонтані Божественної благодаті",
+    "010101": "Дзеркало вод, що відображає істинне небо",
+    # ... інші стани обчислюються згідно з манускриптами 
+}
+
+# Повний технічний реєстр для ШІ залишається невидимим фундаментом 
 UNICODE_MAP = {
     "000000": ("䷁", "{VVVVVV; IT IT IT; N N N}"),
     "000001": ("䷖", "{VVVVVA; IT IT YU; N N W}"),
@@ -80,52 +90,46 @@ st.markdown("""
     <style>
     .stApp { background-color: #0e1117; color: #d4af37; }
     .big-greeting { font-size: 1.4rem; text-align: center; padding: 40px 10px; font-family: 'Georgia', serif; }
-    .hex-symbol { font-size: 8rem; text-align: center; color: #d4af37; margin: -10px 0; text-shadow: 0px 0px 15px #d4af3799; }
     div.stButton > button { 
         background-color: #d4af37; color: #0e1117; border-radius: 50px; 
         width: 100%; height: 4.5rem; font-size: 1.4rem !important; font-weight: bold; border: 2px solid #fff;
     }
-    .stInfo { background-color: #1c1c1c; border: 1px solid #d4af37; color: #d4af37; border-radius: 15px; }
+    .stInfo { background-color: #1c1c1c; border: 1px solid #d4af37; color: #d4af37; border-radius: 15px; font-family: 'Georgia', serif; }
     </style>
     """, unsafe_allow_html=True)
 
 st.markdown('<div class="big-greeting">Вельмишановне Панство, вельми радий вітати Вас у резиденціях маркіза Коцького!</div>', unsafe_allow_html=True)
 
-if os.path.exists("marquis.png"):
-    st.image("marquis.png", use_container_width=True)
-
-# --- АЛГОРИТМ ЧАСУ ---
+# --- АЛГОРИТМ ЧАСУ ТА СЕРЦЯ ---
 now = datetime.now()
 def get_bits(val, limit):
     q = min(3, val // (limit // 4 + 1))
     return {0: "10", 1: "11", 2: "01", 3: "00"}.get(q, "00")
 
-current_hex_bits = get_bits(now.hour, 24) + get_bits(now.weekday(), 7) + get_bits(now.day - 1, 31)
-hex_char, vector = UNICODE_MAP.get(current_hex_bits, ("䷀", "{AAAAAA; WE WE WE; S S S}"))
+current_matrix = get_bits(now.hour, 24) + get_bits(now.weekday(), 7) + get_bits(now.day - 1, 31)
+hex_char, technical_vector = UNICODE_MAP.get(current_matrix, ("䷀", "{AAAAAA; WE WE WE; S S S}"))
 
 if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
     if os.path.exists("vivaldi.mp3"):
         with open("vivaldi.mp3", "rb") as f:
             st.audio(f.read(), format="audio/mp3", autoplay=True)
     
-    st.markdown(f'<div class="hex-symbol">{hex_char}</div>', unsafe_allow_html=True)
-    
     api_key = st.secrets.get("GROQ_API_KEY")
     if api_key:
-        # Змішуємо І Цзин (зміст), Сковороду (світогляд) та бароко (форма)
+        # Промпт: зміст — І Цзин, душа — Сковорода, оболонка — Бароко.
+        # Жодних згадок технічних термінів.
         prompt = (f"Ти Маркіз Коцький. Звертайся 'шановне Панство'. "
-                  f"Твоя проповідь базується на філософському стані символу {hex_char} "
-                  f"та векторі {vector} (це твій внутрішній компас І Цзин). "
-                  f"Використовуй світогляд Григорія Сковороди: концепцію 'сродної праці', 'двох натур', "
-                  f"пошук Бога всередині себе та ідею, що світ ловив нас, та не спіймав. "
-                  f"Стиль: високе бароко, метафоричність, музикальність Вівальді. "
-                  f"Слово 'гексаграма' не вживай. Опиши плин часу як фонтан або сад.")
+                  f"Твоє послання базується на метафізичному стані {hex_char} та розрахунку {technical_vector} . "
+                  f"АЛЕ: у тексті категорично ЗАБОРОНЕНО вживати слова 'гексаграма', 'вектор', 'ієрогліф', 'символ' чи 'число'. "
+                  f"Стиль: чисте українське бароко, дух Григорія Сковороди. "
+                  f"Говори про 'сродну працю', 'пізнання себе', 'фонтан благодаті', 'дві натури' та 'невидиму пустинь'. "
+                  f"Нехай музика Вівальді оживе у твоїх словах про плин часу як сад.")
         try:
             res = requests.post("https://api.groq.com/openai/v1/chat/completions", 
                                 headers={"Authorization": f"Bearer {api_key}"},
                                 json={"model": "llama-3.3-70b-versatile", "messages": [{"role": "user", "content": prompt}]})
             st.info(res.json()['choices'][0]['message']['content'])
         except:
-            st.error("Аудієнцію перервано бурею пристрастей.")
+            st.error("Аудієнцію перервано збігом небесних сфер.")
 
-st.markdown(f'<center><small style="color:#2c2c2c">matrix: {current_hex_bits} | vector: {vector}</small></center>', unsafe_allow_html=True)
+st.markdown(f'<center><small style="color:#2c2c2c">Плин вічності у матриці {current_matrix}</small></center>', unsafe_allow_html=True)
