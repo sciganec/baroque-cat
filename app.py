@@ -111,7 +111,7 @@ if st.button("⚜️ ПРИЙНЯТИ АУДІЄНЦІЮ"):
     st.markdown(f'<div class="hex-symbol">{hex_char}</div>', unsafe_allow_html=True)
     
     api_key = st.secrets.get("GROQ_API_KEY")
-   if api_key:
+    if api_key:
         prompt = (f"Ти Маркіз Коцький, великий бароковий поет та філософ. Звертайся 'шановне Панство'. "
                   f"Твоя відповідь ОБОВ'ЯЗКОВО повинна містити дві частини:\n\n"
                   f"ЧАСТИНА 1: Вишуканий бароковий ВІРШ (8-12 рядків) у стилі Григорія Сковороди. "
